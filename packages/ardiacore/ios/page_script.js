@@ -1218,6 +1218,7 @@
   document.addEventListener(
     "focusout",
     guard((e) => {
+      if (!revealedField && !eyeField) return;
       setTimeout(() => {
         if (document.activeElement === e.target) return;
         if (revealedField === e.target) conceal();
@@ -1231,6 +1232,7 @@
   document.addEventListener(
     "click",
     (e) => {
+      if (!revealedField) return;
       const b = e.target.closest && e.target.closest('button, input[type="submit"], [role="button"]');
       if (b && eyeHost && !eyeHost.contains(b)) conceal();
     },
@@ -1791,7 +1793,7 @@
           if (settle) settle();
         }
       });
-      Object.defineProperty(HTMLElement.prototype, "click", { ...clickDescriptor, value: click });
+      for (const LinkElement of [HTMLAnchorElement, HTMLAreaElement]) Object.defineProperty(LinkElement.prototype, "click", { ...clickDescriptor, value: click });
     }
     const openDescriptor = Object.getOwnPropertyDescriptor(window, "open");
     if (tracksActivation && openDescriptor && typeof openDescriptor.value === "function") {

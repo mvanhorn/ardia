@@ -701,6 +701,18 @@ test("a scripted click on a link is noted only with a user activation, a new-tab
   assert.equal(env.clicked.length, 11, "every call still reaches the browser's own click");
 });
 
+test("only links carry the scripted-click watch: every other element keeps the page's own click", () => {
+  const env = environment();
+  const linkProto = Object.getPrototypeOf(env.link("/a"));
+  const elementClick = Object.getPrototypeOf(env.div()).click;
+  assert.ok(Object.hasOwn(linkProto, "click"), "links get the watched click");
+  assert.notEqual(linkProto.click, elementClick);
+  assert.ok(String(elementClick).includes("clicked.push"), "HTMLElement.prototype.click stays the page's own");
+  env.activation.active = true;
+  env.div().click();
+  assert.deepEqual(newTabLinks(env), []);
+});
+
 test("a scripted click is judged by the link its handlers leave: a target they add counts, a download they add doesn't", () => {
   const env = environment();
   env.activation.active = true;
