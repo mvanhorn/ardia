@@ -37,7 +37,7 @@ function page() {
       this.listeners[type] = fn;
     },
   };
-  const documentElement = { appendChild() {} };
+  const documentElement = { appendChild(host) { this.eye = host; } };
   const document = {
     activeElement: null,
     documentElement,
@@ -97,7 +97,11 @@ test("once the eye shows on a typed password, leaving the field still hides it o
   p.fire("input", { target: field, isTrusted: true });
   assert.equal(p.timers.length, 0);
   p.fire("focusout", { target: field });
+  assert.equal(p.document.documentElement.eye.style.display, "block");
+  p.document.activeElement = null;
   assert.equal(p.timers.length, 1, "a shown eye is checked again after focus moves");
+  p.timers.shift()();
+  assert.equal(p.document.documentElement.eye.style.display, "none");
 });
 
 test("a revealed password is hidden again when the page's own button is clicked", () => {

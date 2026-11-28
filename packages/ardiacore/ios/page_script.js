@@ -1793,7 +1793,7 @@
           if (settle) settle();
         }
       });
-      for (const LinkElement of [HTMLAnchorElement, HTMLAreaElement]) Object.defineProperty(LinkElement.prototype, "click", { ...clickDescriptor, value: click });
+      Object.defineProperty(HTMLElement.prototype, "click", { ...clickDescriptor, value: click });
     }
     const openDescriptor = Object.getOwnPropertyDescriptor(window, "open");
     if (tracksActivation && openDescriptor && typeof openDescriptor.value === "function") {

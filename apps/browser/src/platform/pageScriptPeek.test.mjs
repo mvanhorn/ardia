@@ -701,16 +701,13 @@ test("a scripted click on a link is noted only with a user activation, a new-tab
   assert.equal(env.clicked.length, 11, "every call still reaches the browser's own click");
 });
 
-test("only links carry the scripted-click watch: every other element keeps the page's own click", () => {
+test("a borrowed HTMLElement click still notes an activated new-tab link", () => {
   const env = environment();
-  const linkProto = Object.getPrototypeOf(env.link("/a"));
-  const elementClick = Object.getPrototypeOf(env.div()).click;
-  assert.ok(Object.hasOwn(linkProto, "click"), "links get the watched click");
-  assert.notEqual(linkProto.click, elementClick);
-  assert.ok(String(elementClick).includes("clicked.push"), "HTMLElement.prototype.click stays the page's own");
+  const link = env.link("https://other.example/borrowed", { target: "_blank" });
   env.activation.active = true;
-  env.div().click();
-  assert.deepEqual(newTabLinks(env), []);
+  env.div().click.call(link);
+  assert.deepEqual(newTabLinks(env), ["https://other.example/borrowed"]);
+  assert.deepEqual(env.clicked, [link]);
 });
 
 test("a scripted click is judged by the link its handlers leave: a target they add counts, a download they add doesn't", () => {
